@@ -27,7 +27,7 @@ def get_header_dict(lines):
     if header:
       if len(headers) and headers[0] == header:
         logging.info('匹配目录完成')
-        content_index = i
+        content_index = i + catalog_index + 1 #　要加上初始下标
         break
       headers.append(header)
   
