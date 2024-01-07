@@ -3,22 +3,26 @@ import re
 import sys
 
 def get_header_dict(lines):
-  ''' item = {"name": name, "level": level, content-index: 1}
+  ''' item = {"name": name, "level": level, content_index: 1, catalog_index: 0}
   '''
-  if not has_catalog(lines):
+  
+  # 检查目录是否存在
+  catalog_index = -1
+  for i in range(0, 100):
+    if '目录' in remove_white_space(lines[i]):
+      catalog_index = i
+      break
+      
+  if catalog_index == -1:
     print(lines[:100])
-    logging.error('请为文档添加目录（目录必须在文档顶部）！')
+    logging.error('请为文档添加目录（前100行未找到目录）！')
     sys.exit(1)
   
   logging.info('准备提取目录')
   
   headers = []
-  found_first_header = False
   content_index = 0
-  for i, line in enumerate(lines):
-    if not found_first_header and not is_first_header(line): continue
-    found_first_header = True
-    
+  for i, line in enumerate(lines[catalog_index+1:]):
     header = remove_white_space(line)
     if header:
       if len(headers) and headers[0] == header:
@@ -30,12 +34,10 @@ def get_header_dict(lines):
   headers_with_level = parse_headers("\n".join(headers))
   result = {item['name']: item for item in headers_with_level}
   result['content_index'] = content_index
-  
+  result['catalog_index'] = catalog_index
+
   logging.info('完成提取目录')
   return result
-
-def has_catalog(lines):
-  return '目录' in lines[0]
 
 def is_first_header(line):
   if '1' in line or '一' in line: return True
@@ -67,4 +69,5 @@ def is_empty_line(line):
     line.strip() == '\t'
 
 def remove_white_space(line):
-  return "".join(line.split(' '))
+  result = "".join(line.split(' '))
+  return "".join(result.split('\u3000'))

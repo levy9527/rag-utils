@@ -1,7 +1,8 @@
-# 目录兼容两个事：1.目录两字中间有空格　2.目录前面还有前言
+# 第一章、第二节，通过换行＋空格来区分。这个目前无法处理
 import argparse
 import logging
-from pre_process import is_empty_line
+from pre_process import is_empty_line, get_header_dict
+
 
 def main():
   logging.basicConfig(level=logging.INFO)
@@ -15,8 +16,8 @@ def main():
   with open(args.filename, 'r', encoding='utf-8') as f:
     lines = list(filter(lambda line: not is_empty_line(line), f.readlines()))
     
-    
-    print(lines)
+    header_name_dict = get_header_dict(lines)
+    print(lines[:header_name_dict['catalog_index']])
 
 
 if __name__ == '__main__':
