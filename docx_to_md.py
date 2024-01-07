@@ -7,6 +7,8 @@ import sys
 
 import docx2txt
 
+from pre_process import is_empty_line, remove_white_space
+
 HIDDEN_DIR = '.docx_to_md'
 
 '''
@@ -75,12 +77,6 @@ def main():
 
   logging.info('Job done!')
 
-def is_empty_line(line):
-  return line.strip() == '' or \
-    line.strip() == '\n' or \
-    line.strip() == '\r' or \
-    line.strip() == '\r\n' or \
-    line.strip() == '\t'
 
 def is_meaningless_line(line):
   strip = line.strip()
@@ -118,9 +114,6 @@ def get_header_dict(lines):
   logging.info('完成提取目录')
   return result
 
-
-def remove_white_space(line):
-  return "".join(line.split(' '))
 
 def parse_headers(catalog_text):
   pattern = r'(\d+(\.\d+)*)?(.+?)(?=(\d+(\.\d+)*|$))'
