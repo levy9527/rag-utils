@@ -43,7 +43,6 @@ def is_first_header(line):
   if '1' in line or '一' in line: return True
   return False
 
-# TODO 缺少测试用例
 def parse_headers(catalog_text):
   pattern = r'(\d+(\.\d+)*)?(.+?)(?=(\d+(\.\d+)*|$))'
   headers = []
