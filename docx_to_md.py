@@ -72,7 +72,7 @@ def main():
   with open(output_path, 'w', encoding='utf-8') as file:
     file.write(file_content)
 
-  logging.info('Job done!')
+  logging.info(f'markdown generated: {output_path}')
 
 
 def is_meaningless_line(line):
