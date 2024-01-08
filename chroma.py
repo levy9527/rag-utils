@@ -29,7 +29,7 @@ def get_chroma(host="10.201.0.32", port="8080"):
 
 def get_collection(client, name = DEFAULT_COLLECTION):
   metadata = {
-    "create_by": "levy",
+    "creator": "levy",
     "create_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
   }
   collection = client.get_or_create_collection(name, metadata=metadata,
