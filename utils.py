@@ -12,6 +12,8 @@ from chromadb import Settings
 from chromadb.utils import embedding_functions
 from dotenv import load_dotenv
 
+DEFAULT_COLLECTION = "collection_name"
+
 load_dotenv()
 
 AZURE_API_VERSION = '2023-07-01-preview'
@@ -23,7 +25,7 @@ OPENAI_API_KEY = os.getenv("AZURE_OPENAI_KEY")
 def get_chroma(host="10.201.0.32", port="8080"):
   return chromadb.HttpClient(host, port, settings=Settings(allow_reset=True))
 
-def get_collection(client, name = "deinsight"):
+def get_collection(client, name = DEFAULT_COLLECTION):
   metadata = {
     "create_by": "levy",
     "create_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
