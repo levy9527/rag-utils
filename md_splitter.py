@@ -27,6 +27,8 @@ def main():
   parser = argparse.ArgumentParser()
   # Add the positional argument for the filename (required)
   parser.add_argument("filename", help="markdown file to be split")
+  # Add the optional argument for the delimiter
+  parser.add_argument("--collection", help="collection name to store embeddings")
 
   args = parser.parse_args()
   filename = args.filename
@@ -46,7 +48,7 @@ def main():
     logging.info("begin chunking")
 
     client = get_chroma()
-    collection = get_collection(client)
+    collection = get_collection(client, args.collection)
 
     # TODO need solution to work around this: what if exceed token limit?
     for index, chunk in enumerate(chunks):
