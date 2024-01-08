@@ -1,8 +1,8 @@
-# 第一章、第二节，通过换行＋空格来区分。这个目前无法处理
 import argparse
 import logging
 import re
 
+from chroma import get_chroma, get_collection, put_into_vector_store
 from pre_process import is_empty_line, get_header_dict
 
 
@@ -17,7 +17,8 @@ def main():
   logging.info('opening file...')
   with open(args.filename, 'r', encoding='utf-8') as f:
     lines = list(filter(lambda line: not is_empty_line(line), f.readlines()))
-    
+
+    # TODO 第一章、第二节，通过换行＋空格来区分。这个目前无法处理
     header_name_dict = get_header_dict(lines)
     prefaces = lines[:header_name_dict['catalog_index']]
     preface = ''.join(x for x in prefaces)
@@ -26,7 +27,7 @@ def main():
     chunks = [preface]
     rule = ''
     for i, line in enumerate(contents):
-      # 先章节，只记录法条
+      # 先忽略章节，只记录法条
       if is_rule(line):
         chunks.append(rule)
         rule = line
@@ -35,10 +36,12 @@ def main():
         
     # 最后一条
     chunks.append(rule)
-    
-    for i, line in enumerate(chunks):
-      logging.info(line)
-      
+
+    client = get_chroma()
+    collection = get_collection(client, 'deepal')
+    put_into_vector_store(collection, chunks, args.filename)
+
+    logging.info("job done!")
 
 def is_rule(line: str):
   pattern = r'第[零一二三四五六七八九十百千]+条'

@@ -4,7 +4,7 @@ import os
 import sys
 from typing import Dict
 
-from utils import num_tokens_from_string, get_hash, get_chroma, get_collection
+from chroma import num_tokens_from_string, get_hash, get_chroma, get_collection
 from langchain.text_splitter import MarkdownHeaderTextSplitter
 
 TRUE = 'true'

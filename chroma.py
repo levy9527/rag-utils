@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import re
+import sys
 import uuid
 from datetime import datetime
 
@@ -16,6 +17,7 @@ DEFAULT_COLLECTION = "collection_name"
 
 load_dotenv()
 
+MAX_TOKENS = 4096
 AZURE_API_VERSION = '2023-07-01-preview'
 OPENAI_API_TYPE = 'azure'
 OPENAI_API_BASE = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -40,6 +42,30 @@ def get_collection(client, name = DEFAULT_COLLECTION):
                                                )
   logging.info(collection)
   return collection
+
+
+def put_into_vector_store(collection, chunks, filename, is_keyword_search='false'):
+  for index, chunk in enumerate(chunks):
+    num = len(chunk)
+    # check token
+    # TODO need solution to work around this: what if exceed token limit?
+    if num > MAX_TOKENS:
+      logging.info(f"strlen exceed token limit: {num}")
+      sys.exit(1)
+    else:
+      logging.info('put data into chroma...')
+
+      # 为什么用 uuid? 因为不能批量操作（数据太多），则必须考虑失败重试、重复插入的情况，此时 hash 生成的 id 是稳定的。
+      # 当然，这也引入了 hash 冲突的风险，sha224 概率上足够了，如果冲突了，把无法插入的文本修改一下，再重新插入。
+      collection.upsert(
+        documents=[chunk],
+        metadatas=[{"source": filename,
+                    'index': index,
+                    'is_keyword_search': is_keyword_search,
+                    }],
+        ids=[get_hash(chunk)]
+      )
+
 
 def get_embedding(text, model="text-embedding-ada-002"):
   logging.info('getting embeddings...')
