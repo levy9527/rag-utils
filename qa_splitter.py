@@ -35,6 +35,7 @@ def main():
   parser.add_argument("filename", help="markdown file to be split")
   # Add the optional argument for the delimiter
   parser.add_argument("--delimiter", help="Specify the delimiter string")
+  parser.add_argument("--collection", help="collection name to store embeddings")
 
   args = parser.parse_args()
   filename = args.filename
@@ -63,7 +64,7 @@ def main():
       chunks = list(map(lambda x: "".join(line for line in x), regrouped_lines))
 
     client = get_chroma()
-    collection = get_collection(client)
+    collection = get_collection(client, args.collection)
 
     # TODO need solution to work around this: what if exceed token limit?
     for index, chunk in enumerate(chunks):
@@ -138,12 +139,12 @@ def get_embedding(text, model="text-embedding-ada-002"):
 def get_chroma(host="10.201.0.32", port="8080"):
   return chromadb.HttpClient(host, port, settings=Settings(allow_reset=True))
 
-def get_collection(client):
+def get_collection(client, collection_name):
   metadata = {
     "create_by": "levy",
     "create_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
   }
-  collection = client.get_or_create_collection('deinsight', metadata=metadata,
+  collection = client.get_or_create_collection(collection_name, metadata=metadata,
                                                embedding_function=embedding_functions.OpenAIEmbeddingFunction(
                                                  api_key=OPENAI_API_KEY,
                                                  api_base=OPENAI_API_BASE,
