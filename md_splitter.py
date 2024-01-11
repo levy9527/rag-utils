@@ -6,6 +6,7 @@ from typing import Dict
 
 from chroma import num_tokens_from_string, get_hash, get_chroma, get_collection, put_into_vector_store
 from langchain.text_splitter import MarkdownHeaderTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 TRUE = 'true'
 
@@ -40,12 +41,19 @@ def main():
 
     content = f.read()
 
+    logging.info("begin chunking")
     markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
-    docs = markdown_splitter.split_text(content)
+    markdown_docs = markdown_splitter.split_text(content)
+
+    chunk_size = 512
+    chunk_overlap = 50
+    text_splitter = RecursiveCharacterTextSplitter(
+      chunk_size=chunk_size, chunk_overlap=chunk_overlap
+    )
+    docs = text_splitter.split_documents(markdown_docs)
+
     chunks = convert_doc_to_chunks(docs)
     doc_headers = [doc.metadata for doc in docs]
-
-    logging.info("begin chunking")
 
     client = get_chroma()
     collection = get_collection(client, args.collection)

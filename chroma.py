@@ -17,7 +17,7 @@ DEFAULT_COLLECTION = "collection_name"
 
 load_dotenv()
 
-MAX_LENGTH = 4096
+MAX_LENGTH = 1024
 AZURE_API_VERSION = '2023-07-01-preview'
 OPENAI_API_TYPE = 'azure'
 OPENAI_API_BASE = os.getenv("AZURE_OPENAI_ENDPOINT")
