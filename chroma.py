@@ -17,7 +17,7 @@ DEFAULT_COLLECTION = "collection_name"
 
 load_dotenv()
 
-MAX_TOKENS = 4096
+MAX_LENGTH = 4096
 AZURE_API_VERSION = '2023-07-01-preview'
 OPENAI_API_TYPE = 'azure'
 OPENAI_API_BASE = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -49,9 +49,9 @@ def put_into_vector_store(collection, chunks, filename, is_keyword_search='false
   for index, chunk in enumerate(chunks):
     num = len(chunk)
     # TODO need solution to work around this: what if exceed token limit?
-    if num > MAX_TOKENS:
+    if num > MAX_LENGTH:
       logging.info(chunk)
-      logging.error(f"strlen exceed token limit: {num}")
+      logging.error(f"strlen {num} exceed size limit: {MAX_LENGTH}")
       sys.exit(1)
 
 
@@ -63,7 +63,7 @@ def put_into_vector_store(collection, chunks, filename, is_keyword_search='false
       upsert_func(index, chunk)
       continue
 
-    # 为什么用 uuid? 因为不能批量操作（数据太多），则必须考虑失败重试、重复插入的情况，此时 hash 生成的 id 是稳定的。
+    # 为什么不用 uuid? 因为分批操作（数据太多），则必须考虑失败重试、重复插入的情况，此时 hash 生成的 id 是稳定的。
     # 当然，这也引入了 hash 冲突的风险，sha224 概率上足够了，如果冲突了，把无法插入的文本修改一下，再重新插入。
     collection.upsert(
       documents=[chunk],
@@ -103,6 +103,8 @@ def get_uuid():
   return str(random_uuid)
 
 def get_hash(content):
+  # FIXME just for be compatible
+  return get_uuid()
   hash_object = hashlib.sha224()
 
   # Convert the content to bytes and update the hash object
