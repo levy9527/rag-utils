@@ -11,6 +11,8 @@ def main():
   parser = argparse.ArgumentParser()
   # Add the positional argument for the filename (required)
   parser.add_argument("filename", help="law filename to be processed")
+  # Add the optional argument for the delimiter
+  parser.add_argument("--collection", help="collection name to store embeddings")
 
   args = parser.parse_args()
   
@@ -38,7 +40,7 @@ def main():
     chunks.append(rule)
 
     client = get_chroma()
-    collection = get_collection(client, 'deepal')
+    collection = get_collection(client, args.collection)
     put_into_vector_store(collection, chunks, args.filename)
 
     logging.info("job done!")
